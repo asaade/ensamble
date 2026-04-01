@@ -225,15 +225,15 @@ function apply_constraints!(
 end
 
 """
-    normalize_condition_values(values::Union{Vector, BitVector})::Vector{Any}
+    normalize_condition_values(values::AbstractVector)::Vector{Any}
 
 Converts Boolean vectors to group values (`true` becomes a group identifier) and normalizes other vector types.
 """
-function normalize_condition_values(values::Union{Vector, BitVector})::Vector{Any}
+function normalize_condition_values(values::AbstractVector)::Vector{Any}
     try
-        # Handle BitVector: convert true to 1, false to missing
-        if isa(values, BitVector)
-            return [x ? 1 : missing for x in values]
+        # Handle Boolean array: convert true to 1, false to missing, missing stays missing
+        if eltype(values) <: Union{Bool, Missing}
+            return [isequal(x, true) ? 1 : missing for x in values]
         else
             # Handle other Vector types and explicitly keep `missing` intact
             return [ismissing(x) ? missing : x for x in values]
