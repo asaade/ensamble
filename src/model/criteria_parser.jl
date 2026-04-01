@@ -70,10 +70,11 @@ end
 Finds the closest matching column name in the DataFrame.
 """
 function suggest_similar_column(input_column::Symbol, df::DataFrame)::AbstractString
-    existing_columns = Symbol.(names(df))
-    distances = [levenshtein(string(input_column), string(col)) for col in existing_columns]
+    existing_columns = names(df)
+    input_str = string(input_column)
+    distances = [levenshtein(input_str, col) for col in existing_columns]
     closest_match = existing_columns[argmin(distances)]
-    return string(closest_match)
+    return closest_match
 end
 
 """
