@@ -200,6 +200,9 @@ function expected_score_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 
     num_thetas = length(θ_values)
     score_matrix = zeros(num_items, num_thetas)
 
+    # Extracting difficulty parameters (bs) from columns B1, B2, etc.
+    b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
+
     @threads for idx in 1:num_items
         model = bank[idx, :MODEL]
         a = bank[idx, :A]
@@ -208,8 +211,6 @@ function expected_score_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 
         else
             0.0  # Default value for non-3PL models to ensure consistent type handling
         end
-        # Extracting difficulty parameters (bs) from columns B1, B2, etc.
-        b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
         bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
 
         # Ensure bs is always a vector, even for dichotomous models
