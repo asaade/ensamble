@@ -78,14 +78,12 @@ function simulate_scores(
         bank::DataFrame,
         results::DataFrame,
         dist::Distribution = Normal(0, 1);
-        D = 1.0
+        D = 1.0,
+        id_to_index::Dict = Dict(id => idx for (idx, id) in enumerate(bank.ID))
 )
     n_forms = size(results, 2)
     total_scores_list = Vector{Vector{Float64}}()
     max_total_score = 0
-
-    # Create a mapping from item IDs to indices in bank
-    id_to_index = Dict(id => idx for (idx, id) in enumerate(bank.ID))
 
     for form in 1:n_forms
         # Extract item IDs for the current form
@@ -128,14 +126,12 @@ function simulate_scores_log(
         bank::DataFrame,
         results::DataFrame,
         dist::Distribution = Normal(0, 1);
-        D = 1.0
+        D = 1.0,
+        id_to_index::Dict = Dict(id => idx for (idx, id) in enumerate(bank.ID))
 )
     n_forms = size(results, 2)
     total_scores_list = Vector{Vector{Float64}}()
     max_total_score = 0
-
-    # Create a mapping from item IDs to indices in bank
-    id_to_index = Dict(id => idx for (idx, id) in enumerate(bank.ID))
 
     for form in 1:n_forms
         # Extract item IDs for the current form
@@ -176,7 +172,8 @@ end
 
 function expected_score_curves(
         parms::Parameters, results::DataFrame,
-        theta_range::Union{AbstractVector, AbstractRange}
+        theta_range::Union{AbstractVector, AbstractRange};
+        id_to_index::Dict = Dict(id => idx for (idx, id) in enumerate(parms.bank.ID))
 )::DataFrame
     bank = parms.bank
     n_forms = size(results, 2)
@@ -190,7 +187,7 @@ function expected_score_curves(
         scores = zeros(Float64, n_thetas)
 
         # Retrieve parameters for selected items using item IDs
-        item_params = [irt_params(bank, findfirst(==(id), bank.ID))
+        item_params = [irt_params(bank, id_to_index[id])
                        for id in selected if !ismissing(id)]
 
         # Calculate scores for each theta value
@@ -214,7 +211,8 @@ end
 function expected_info_curves(
         parms::Parameters,
         results::DataFrame,
-        theta_range::Union{AbstractVector, AbstractRange}
+        theta_range::Union{AbstractVector, AbstractRange};
+        id_to_index::Dict = Dict(id => idx for (idx, id) in enumerate(parms.bank.ID))
 )
     bank = parms.bank
     theta::Vector{Float64} = collect(theta_range)
@@ -227,7 +225,7 @@ function expected_info_curves(
     # Loop over each form
     for i in 1:n_forms
         selected = results[:, i]  # Select the i-th column (item IDs as strings)
-        item_params = [irt_params(bank, findfirst(==(id), bank.ID))
+        item_params = [irt_params(bank, id_to_index[id])
                        for id in selected if !ismissing(id)]
 
         # Initialize a vector to store the total information at each theta value
@@ -276,13 +274,15 @@ function plot_results(
         theta_range::Union{AbstractVector, AbstractRange} = -4.0:0.1:4.0,
         plot_file::String = "results/combined_plot.pdf"
 )::DataFrame
-    # Generate characteristic and information curves
-    char_data = expected_score_curves(parms, results, theta_range)
+    id_to_index = Dict(id => idx for (idx, id) in enumerate(parms.bank.ID))
 
-    info_data = expected_info_curves(parms, results, theta_range)
+    # Generate characteristic and information curves
+    char_data = expected_score_curves(parms, results, theta_range; id_to_index=id_to_index)
+
+    info_data = expected_info_curves(parms, results, theta_range; id_to_index=id_to_index)
 
     # Generate simulation data
-    sim_data = DataFrame(simulate_scores(parms.bank, results), :auto)
+    sim_data = DataFrame(simulate_scores(parms.bank, results; id_to_index=id_to_index), :auto)
 
     # Combine all plots
     combined = combine_plots(parms, theta_range, char_data, info_data, sim_data)
