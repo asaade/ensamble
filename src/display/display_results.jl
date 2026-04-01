@@ -215,11 +215,19 @@ Returns a table of tolerances for each form.
 """
 function tolerances_table(tols::Vector{Float64})::String
     header = ["Form", "Tolerance"]
-    form_ids = [i for i in eachindex(tols)]
-    table_data = Dict(k => rpad(v, 6, "0") for (k, v) in zip(form_ids, tols))
+    # Generate form IDs based on the index of the tolerances
+    form_ids = collect(eachindex(tols))
+    # Create a formatted vector of tolerance strings
+    formatted_tols = [rpad(v, 6, "0") for v in tols]
+    # Combine into a 2-column matrix
+    table_matrix = hcat(form_ids, formatted_tols)
 
     return pretty_table(
-        String, table_data; column_labels = header, sortkeys = true, alignment = :c)
+        String,
+        table_matrix;
+        column_labels = header,
+        alignment = :c
+    )
 end
 
 """
