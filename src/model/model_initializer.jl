@@ -407,13 +407,24 @@ Checks for all-or-none conflicts between two sets of values.
 function all_or_none_conflict_rule(
         friends_values::Vector, anchor_values::Vector
 )::Vector{Tuple}
-    group_dict = Dict{Any, Set{Any}}()
+    T_friend = nonmissingtype(eltype(friends_values))
+    T_anchor = nonmissingtype(eltype(anchor_values))
+
+    # Fallback to Any if types cannot be inferred (e.g. Union{})
+    if T_friend === Union{} || T_friend === Any
+        T_friend = Any
+    end
+    if T_anchor === Union{} || T_anchor === Any
+        T_anchor = Any
+    end
+
+    group_dict = Dict{T_friend, Set{T_anchor}}()
     for (friend, anchor) in zip(friends_values, anchor_values)
         if !ismissing(friend) && !ismissing(anchor)
-            if !haskey(group_dict, friend)
-                group_dict[friend] = Set{Any}()
+            set = get!(group_dict, friend) do
+                Set{T_anchor}()
             end
-            push!(group_dict[friend], anchor)
+            push!(set, anchor)
         end
     end
     conflicts = [(friend, anchors)
