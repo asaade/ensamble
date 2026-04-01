@@ -56,7 +56,6 @@ function read_constraints(file_path::String, parms::Parameters)
     type_counts = Dict("test" => 0, "overlap" => 0, "maxuse" => 0)
 
     for row in eachrow(df)
-        row = map(upcase, row)
         if row[:ONOFF] == "ON"
             cond_id = validate_cond_id(String(row[:CONSTRAINT_ID]), cond_ids_seen)
             type = validate_type(String(row[:TYPE]), cond_id)
@@ -66,9 +65,9 @@ function read_constraints(file_path::String, parms::Parameters)
                 type_counts[lowercase(type)] += 1
             end
 
-            condition_expr = String(row[:CONDITION])
-            lb = get(row, :LB, 0)
-            ub = get(row, :UB, 0)
+            condition_expr = ismissing(row[:CONDITION]) ? "" : String(row[:CONDITION])
+            lb = coalesce(get(row, :LB, 0), 0)
+            ub = coalesce(get(row, :UB, 0), 0)
             validate_bounds(type, lb, ub, cond_id)
 
             condition = if strip(condition_expr) == ""
@@ -86,7 +85,7 @@ function read_constraints(file_path::String, parms::Parameters)
             error("Constraint 'TEST' must be included exactly once, but $count found.")
         elseif count > 1 && type in ["overlap", "maxuse"]
             parms.max_item_use = max(2, parms.max_item_use)
-            warn("Constraint '$type' can only appear once, but $count found. MAX_ITEM_USE set as >= 2")
+            @warn "Constraint '$type' can only appear once, but $count found. MAX_ITEM_USE set as >= 2"
         end
     end
 

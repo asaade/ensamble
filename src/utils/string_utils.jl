@@ -87,7 +87,7 @@ and skips over missing values.
 """
 function uppercase_dataframe!(df::DataFrames.DataFrame)::DataFrames.DataFrame
     for col in eachcol(df)
-        if eltype(col) <: AbstractString  # Only process string columns
+        if nonmissingtype(eltype(col)) <: AbstractString  # Only process string columns
             for i in eachindex(col)
                 if !ismissing(col[i])  # Handle missing values
                     col[i] = uppercase(col[i])
