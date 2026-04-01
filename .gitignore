@@ -26,6 +26,9 @@
 *.log
 *.sql
 *.sqlite
+*.csv
+*.toml
+*.yaml
 
 # OS generated files #
 ######################
