@@ -76,7 +76,7 @@ function read_constraints(file_path::String, parms::Parameters)
             else
                 validate_condition_syntax(condition_expr, cond_id)
             end
-            constraints[cond_id] = Constraint(cond_id, type, eval(condition), lb, ub)
+            constraints[cond_id] = Constraint(cond_id, type, condition, lb, ub)
         end
     end
 
