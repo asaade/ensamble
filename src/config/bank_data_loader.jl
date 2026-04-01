@@ -83,7 +83,8 @@ function add_anchor_labels!(bank::DataFrame, anchor_tests::DataFrame)::DataFrame
         bank.ANCHOR = Vector{Union{Missing, Int}}(missing, nrow(bank))
 
         for i in 1:ncol(anchor_tests)  # Using ncol() from DataFrames.jl
-            dfv = view(bank, bank.ID .∈ Ref(anchor_tests[:, i]), :)
+            anchor_set = Set(anchor_tests[:, i])
+            dfv = view(bank, bank.ID .∈ Ref(anchor_set), :)
             @. dfv.ANCHOR = i
         end
 
