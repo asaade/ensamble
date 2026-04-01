@@ -85,7 +85,7 @@ function anchor_summary(results::DataFrame, bank::DataFrame)::String
     end
 
     table_matrix = hcat(table_data...)'
-    return pretty_table(String, table_matrix; header = header, alignment = :r)
+    return pretty_table(String, table_matrix; column_labels = header, alignment = :r)
 end
 
 """
@@ -115,7 +115,7 @@ function col_sums(results::DataFrame, bank::DataFrame, cols)::String
     end
 
     return pretty_table(
-        String, hcat(table_data...); header = ["Form"; cols...], alignment = :r)
+        String, hcat(table_data...); column_labels = ["Form"; cols...], alignment = :r)
 end
 
 """
@@ -147,12 +147,12 @@ function cat_counts(
     if length(categories) <= max_cats
         header = ["Form"; categories...]
         table_matrix = hcat(table_data...)
-        pretty_table(String, table_matrix'; header = header, alignment = :r)
+        pretty_table(String, table_matrix'; column_labels = header, alignment = :r)
     else
         header = ["Category"; [string("Form ", i) for i in 1:num_forms]...]
         table_matrix = hcat([categories]..., [row[2:end] for row in table_data]...)
         valid_rows = [any(row[2:end] .!= 0) for row in eachrow(table_matrix)]
-        pretty_table(String, table_matrix[valid_rows, :]; header = header, alignment = :r)
+        pretty_table(String, table_matrix[valid_rows, :]; column_labels = header, alignment = :r)
     end
 end
 
@@ -174,7 +174,7 @@ function common_items(results::DataFrame)::String
 
     header = [""; collect(1:num_forms)...]
     return pretty_table(
-        String, hcat(collect(1:num_forms), common_matrix); header = header, alignment = :r
+        String, hcat(collect(1:num_forms), common_matrix); column_labels = header, alignment = :r
     )
 end
 
@@ -203,7 +203,7 @@ function final_summary(parms::Parameters, results::DataFrame)::String
     return pretty_table(
         String,
         hcat(labels, string.(values));
-        header = ["Concept", "Count"],
+        column_labels = ["Concept", "Count"],
         alignment = [:l, :r]
     )
 end
@@ -219,7 +219,7 @@ function tolerances_table(tols::Vector{Float64})::String
     table_data = Dict(k => rpad(v, 6, "0") for (k, v) in zip(form_ids, tols))
 
     return pretty_table(
-        String, table_data; header = header, sortkeys = true, alignment = :c)
+        String, table_data; column_labels = header, sortkeys = true, alignment = :c)
 end
 
 """
