@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>constraints.html</title>
+<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"  />
+<link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css"  /><meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'><style> body { box-sizing: border-box; max-width: 740px; width: 100%; margin: 40px auto; padding: 0 10px; } </style><script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script><script src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script><script>document.addEventListener('DOMContentLoaded', () => { document.body.classList.add('markdown-body'); document.querySelectorAll('pre[lang] > code').forEach((code) => { code.classList.add(code.parentElement.lang); }); document.querySelectorAll('pre > code').forEach((code) => { hljs.highlightBlock(code); }); });</script>
+</head>
+
+<body>
+
+<h2
+id="user-guide-for-configuring-constraints-in-the-constraints.csv-file">User
+Guide for Configuring Constraints in the <code>constraints.csv</code>
+File</h2>
+<p>The constraint configuration system allows users to specify a set of
+rules that an automated test assembly must adhere to when constructing
+test forms. The constraints.csv file defines various constraint types,
+ensuring that the assembled test aligns with blueprint requirements,
+such as the number of items, score limits, and inclusion or exclusion of
+specific items.</p>
+<h3 id="file-structure">File Structure</h3>
+<p>The file is expected to have the following columns:</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 85%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>CONSTRAINT_ID</strong></td>
+<td>Unique identifier for each constraint. Can be any string but must be
+unique within the file.</td>
+</tr>
+<tr class="even">
+<td><strong>TYPE</strong></td>
+<td>Specifies the constraint type. Accepted values are
+<code>Number</code>, <code>Sum</code>, <code>Enemies</code>,
+<code>Include</code>, <code>Exclude</code>, <code>AllOrNone</code>,
+etc.</td>
+</tr>
+<tr class="odd">
+<td><strong>CONDITION</strong></td>
+<td>Optional condition to filter items for which the constraint
+applies.</td>
+</tr>
+<tr class="even">
+<td><strong>LB</strong></td>
+<td>Lower bound for the constraint. If not required, leave empty.</td>
+</tr>
+<tr class="odd">
+<td><strong>UB</strong></td>
+<td>Upper bound for the constraint. If not required, leave empty.</td>
+</tr>
+<tr class="even">
+<td><strong>ONOFF</strong></td>
+<td>Set to <code>OFF</code> to deactivate the constraint; otherwise,
+<code>ON</code> or empty will apply the constraint.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong>: Using a spreadsheet application like Excel is
+recommended for editing this file, as it helps maintain the proper
+structure and visibility for each constraint.</p>
+<h3 id="an-example">An example</h3>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 19%" />
+<col style="width: 14%" />
+<col style="width: 36%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>C1</td>
+<td>Test</td>
+<td></td>
+<td>80</td>
+<td>80</td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>C2</td>
+<td>Score</td>
+<td>AREA == 1</td>
+<td>18</td>
+<td>22</td>
+<td>ON</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>C3</td>
+<td>Score</td>
+<td>AREA == 2</td>
+<td>18</td>
+<td>22</td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>C4</td>
+<td>Score</td>
+<td>AREA == 3</td>
+<td>18</td>
+<td>22</td>
+<td>ON</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>C5</td>
+<td>Score</td>
+<td>AREA == 4</td>
+<td>18</td>
+<td>22</td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>C6</td>
+<td>Sum</td>
+<td>Words</td>
+<td>2800</td>
+<td>3400</td>
+<td>ON</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>C7</td>
+<td>Enemies</td>
+<td>Enemies</td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>C8</td>
+<td>AllOrNone</td>
+<td>Friends</td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>C9</td>
+<td>MaxUse</td>
+<td></td>
+<td>0</td>
+<td>2</td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>C10</td>
+<td>Overlap</td>
+<td></td>
+<td>10</td>
+<td>10</td>
+<td>OFF</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>C11</td>
+<td>Exclude</td>
+<td>CORR &lt;= 0.12</td>
+<td></td>
+<td></td>
+<td>OFF</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>C12</td>
+<td>AllOrNone</td>
+<td>ID in [ITEM0001,ITEM0002]</td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>C13</td>
+<td>Enemies</td>
+<td>ID in [ITEM0036,ITEM00039]</td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<h3 id="column-descriptions">Column Descriptions</h3>
+<h4 id="constraint_id">CONSTRAINT_ID</h4>
+<p>The unique identifier for each constraint. This can be any
+alphanumeric value but must be unique across all constraints in the
+file. It is useful for tracking and debugging.</p>
+<h4 id="type">TYPE</h4>
+<p>Specifies the type of constraint to apply. The available types
+are:</p>
+<ol type="1">
+<li><strong>Number</strong>: Limits the count of items selected. Use the
+<code>CONDITION</code> column to specify a subset of items. For example:
+<ul>
+<li><p><strong>Example</strong>: To ensure exactly 10 items with
+<code>LEVEL == 3</code> are selected:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB
+C1, Number, LEVEL == 3, 10, 10</code></pre></li>
+</ul></li>
+<li><strong>Sum</strong>: Limits the sum of an item attribute across
+selected items. It can control the sum directly or conditionally (e.g.,
+summing items that meet a specific criterion). This is useful for
+attributes like score weights or item difficulty.
+<ul>
+<li><p><strong>Example</strong>: To ensure the sum of <code>WORDS</code>
+is between 500 and 600 for selected items:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB
+C2, Sum, WORDS, 500, 600</code></pre></li>
+</ul></li>
+<li><strong>Enemies</strong>: Specifies that items meeting the condition
+should be mutually exclusive in the selection. This is useful when items
+are too similar or should not appear together in a form.
+<ul>
+<li><p><strong>Example</strong>: Ensure only one of the two items
+(<code>ID</code> in [A1, A2]) is included:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION
+C3, Enemies, ID IN [A1, A2]</code></pre></li>
+</ul></li>
+<li><strong>Include</strong>: Forces the inclusion of items that meet
+the specified condition.
+<ul>
+<li><p><strong>Example</strong>: Always include items where
+<code>AREA == Math</code>:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION
+C4, Include, AREA == Math</code></pre></li>
+</ul></li>
+<li><strong>Exclude</strong>: Ensures that items meeting the specified
+condition are excluded from the selection.
+<ul>
+<li><p><strong>Example</strong>: Exclude items where
+<code>PTBIS &lt; 0.15</code>:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION
+C5, Exclude, PTBIS &lt; 0.15</code></pre></li>
+</ul></li>
+<li><strong>AllOrNone</strong>: Ensures that all items meeting a
+condition are either included together or excluded entirely.
+<ul>
+<li><p><strong>Example</strong>: Either include all items
+<code>ID IN [B1, B2]</code> or none:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION
+C6, AllOrNone, ID IN [B1, B2]</code></pre></li>
+</ul></li>
+<li><strong>Overlap</strong>: Forces the forms to share a number of
+items. Is more compute-intensive and only works without anchors and
+shadow tests.
+<ul>
+<li><p><strong>Example</strong>: Include 10 common items between each
+two forms:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB
+C7, Overlap,, 10, 10</code></pre></li>
+</ul></li>
+<li><strong>MaxUse</strong>: Ensures that an items only appears at most
+that number of times in the forms.
+<ul>
+<li><p><strong>Example</strong>: All items (except anchor items) should
+appear only in one form, at the most:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB
+C7, MaxUse,, 0, 1</code></pre></li>
+</ul></li>
+</ol>
+<h4 id="condition">CONDITION</h4>
+<p>The condition restricts the items the constraint applies to. It is
+optional and can be left blank if the constraint applies to all
+items.</p>
+<p>Conditions are specified using <em>column names from the item bank
+file</em> and logical expressions (e.g., <code>LEVEL == 3</code>,
+<code>AREA == Math</code>). Conditions can be combined using logical
+operators such as <code>&amp;&amp;</code> (AND) and <code>||</code> (OR)
+or set membership operators such as <code>IN</code> (e.g.,
+<code>LEVEL IN [2, 3, 4]</code>).</p>
+<p><strong>Examples</strong>: -
+<code>LEVEL == 3 &amp;&amp; AREA == Math</code>: Applies the constraint
+to items in the column ‘AREA’ with the name ‘Math’ and in the column
+‘LEVEL’ with a value of 3. -
+<code>DIFFICULTY &gt;= 0.5 || PTBIS &gt; 0.2</code>: Applies if
+difficulty is at least 0.5 or if the item discrimination index (PTBIS)
+is greater than 0.2.</p>
+<h4 id="lb-lower-bound-and-ub-upper-bound">LB (Lower Bound) and UB
+(Upper Bound)</h4>
+<p>These specify the minimum and maximum values for the constraint. For
+example, if <code>TYPE</code> is <code>Number</code>, <code>LB</code>
+and <code>UB</code> set the minimum and maximum count of items. If the
+<code>TYPE</code> is <code>Sum</code>, <code>LB</code> and
+<code>UB</code> represent the minimum and maximum allowable sums for an
+attribute.</p>
+<p><strong>Examples</strong>: - To select between 10 and 15 items where
+<code>LEVEL == 3</code>:
+<code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB   C7, Number, LEVEL == 3, 10, 15</code></p>
+<ul>
+<li><p>To constrain the sum of <code>WORDS</code> to be exactly 700:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB
+C8, Sum, WORDS, 700, 700</code></pre></li>
+</ul>
+<h4 id="onoff">ONOFF</h4>
+<p>This column toggles the constraint. Set to <code>OFF</code> to
+deactivate the constraint. If left blank or set to <code>ON</code>, the
+constraint will be active.</p>
+<hr />
+<h3 id="example-configurations">Example Configurations</h3>
+<h4 id="ensuring-a-fixed-item-count-with-conditions">Ensuring a Fixed
+Item Count with Conditions</h4>
+<p>The following configuration ensures that exactly 12 items with
+<code>LEVEL == 3</code> are included in the selection:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB, ONOFF
+C1, Number, LEVEL == 3, 12, 12, ON</code></pre>
+<h4 id="constraining-sum-of-attributes-with-a-condition">Constraining
+Sum of Attributes with a Condition</h4>
+<p>To ensure that the sum of <code>WORDS</code> for items where
+<code>DIFFICULTY &gt;= 0.4</code> falls between 300 and 500:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, LB, UB, ONOFF
+C2, Sum, WORDS, DIFFICULTY &gt;= 0.4, 300, 500, ON</code></pre>
+<h4 id="excluding-certain-items-from-selection">Excluding Certain Items
+from Selection</h4>
+<p>To exclude items with <code>PTBIS &lt; 0.15</code>:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, ONOFF
+C3, Exclude, PTBIS &lt; 0.15, ON</code></pre>
+<h4 id="applying-enemy-constraints">Applying Enemy Constraints</h4>
+<p>To specify that only one of the items <code>ID == A1</code> or
+<code>ID == A2</code> can be included:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, ONOFF
+C4, Enemies, ID IN [A1, A2], ON</code></pre>
+<h4 id="ensuring-all-or-none-selection-for-grouped-items">Ensuring
+All-or-None Selection for Grouped Items</h4>
+<p>To include both or none of the items where <code>ID</code> is in [B1,
+B2]:</p>
+<pre><code>CONSTRAINT_ID, TYPE, CONDITION, ONOFF
+C5, AllOrNone, ID IN [B1, B2], ON</code></pre>
+<p>Here are examples of constraint conditions for different scenarios
+and <code>TYPE</code> values in the <code>constraints.csv</code> file.
+These examples include commonly used conditions, such as item
+difficulty, area, and item properties like <code>LEVEL</code> or
+<code>WORD_COUNT</code>, which are typical in test assembly
+contexts.</p>
+<hr />
+<h3 id="general-structure">General Structure</h3>
+<p>A constraint condition is specified in the <code>CONDITION</code>
+column and defines criteria that items must meet for the constraint to
+apply to them. The condition can be left blank if it should apply to all
+items.</p>
+<h4 id="syntax-guidelines">Syntax Guidelines</h4>
+<ul>
+<li>Conditions can include relational operators: <code>==</code>,
+<code>!=</code>, <code>&gt;</code>, <code>&lt;</code>,
+<code>&gt;=</code>, <code>&lt;=</code>.</li>
+<li>Logical operators <code>&amp;&amp;</code> (AND), <code>||</code>
+(OR) allow combining multiple conditions.</li>
+<li>The <code>IN</code> operator allows for checking set membership
+(e.g., <code>LEVEL IN [2, 3, 4]</code>).</li>
+</ul>
+<hr />
+<h3 id="condition-examples-by-type">Condition Examples by TYPE</h3>
+<h4 id="number---limits-the-count-of-selected-items">1.
+<strong>Number</strong> - Limits the count of selected items</h4>
+<ul>
+<li><p>Select exactly 15 items with difficulty level 3:
+<code>CONDITION: LEVEL == 3      LB: 15      UB: 15</code></p></li>
+<li><p>Include between 10 and 20 items with <code>AREA == Math</code>:
+<code>CONDITION: AREA == Math      LB: 10      UB: 20</code></p></li>
+<li><p>Select items with <code>DIFFICULTY &gt;= 0.4</code> and
+<code>LEVEL IN [1, 2, 3]</code>:
+<code>CONDITION: DIFFICULTY &gt;= 0.4 &amp;&amp; LEVEL IN [1, 2, 3]      LB: 5      UB: 10</code></p></li>
+</ul>
+<h4 id="sum---constrains-the-sum-of-an-attribute">2.
+<strong>Sum</strong> - Constrains the sum of an attribute</h4>
+<ul>
+<li><p>Sum of <code>WORD_COUNT</code> for all items should be between
+500 and 600:
+<code>CONDITION: WORD_COUNT      LB: 500      UB: 600</code></p></li>
+<li><p>Sum of <code>WORD_COUNT</code> for items in level 2 or higher
+should be between 700 and 800:
+<code>CONDITION: WORD_COUNT, LEVEL &gt;= 2      LB: 700      UB: 800</code></p></li>
+<li><p>Sum of <code>POINTS</code> for items with
+<code>AREA == Science</code>:
+<code>CONDITION: POINTS, AREA == Science      LB: 50      UB: 70</code></p></li>
+</ul>
+<h4 id="enemies---ensures-mutual-exclusivity-among-items">3.
+<strong>Enemies</strong> - Ensures mutual exclusivity among items</h4>
+<ul>
+<li><p>Only one of items with <code>ID</code> in
+<code>[A1, A2, A3]</code> can be included:
+<code>CONDITION: ID IN [A1, A2, A3]</code></p></li>
+<li><p>Select only one item with difficulty above 0.6 and level 4:
+<code>CONDITION: DIFFICULTY &gt; 0.6 &amp;&amp; LEVEL == 4</code></p></li>
+</ul>
+<h4 id="include---ensures-certain-items-are-always-included">4.
+<strong>Include</strong> - Ensures certain items are always
+included</h4>
+<ul>
+<li><p>Always include items in <code>[B1, B2]</code>:
+<code>CONDITION: ID IN [B1, B2]</code></p></li>
+<li><p>Always include items with difficulty above 0.5 in the Math area:
+<code>CONDITION: DIFFICULTY &gt; 0.5 &amp;&amp; AREA == Math</code></p></li>
+</ul>
+<h4 id="exclude---ensures-certain-items-are-never-included">5.
+<strong>Exclude</strong> - Ensures certain items are never included</h4>
+<ul>
+<li><p>Exclude items with point-biserial correlation below 0.15:
+<code>CONDITION: PTBIS &lt; 0.15</code></p></li>
+<li><p>Exclude items where <code>LEVEL == 1</code> and
+<code>DIFFICULTY &lt;= 0.3</code>:
+<code>CONDITION: LEVEL == 1 &amp;&amp; DIFFICULTY &lt;= 0.3</code></p></li>
+</ul>
+<h4
+id="allornone---ensures-all-items-in-a-condition-group-are-included-or-excluded-together">6.
+<strong>AllOrNone</strong> - Ensures all items in a condition group are
+included or excluded together</h4>
+<ul>
+<li><p>Either include all or none of the items with
+<code>ID IN [C1, C2, C3]</code>:
+<code>CONDITION: ID IN [C1, C2, C3]</code></p></li>
+<li><p>Either include all or none of the items with
+<code>LEVEL == 2</code> in the Science area:
+<code>CONDITION: LEVEL == 2 &amp;&amp; AREA == Science</code></p></li>
+</ul>
+<hr />
+<h3 id="combined-conditions">Combined Conditions</h3>
+<p>You can use <code>&amp;&amp;</code> (AND) and <code>||</code> (OR)
+operators to create more complex conditions. Here are examples:</p>
+<ul>
+<li><p><strong>Selecting items based on multiple attributes</strong>:
+Include items where <code>LEVEL == 2</code> and
+<code>DIFFICULTY &gt;= 0.3</code>.</p>
+<pre><code>CONDITION: LEVEL == 2 &amp;&amp; DIFFICULTY &gt;= 0.3</code></pre></li>
+<li><p><strong>Ensuring diversity in item attributes</strong>: Require
+items to have either a low difficulty
+(<code>DIFFICULTY &lt;= 0.3</code>) or high discrimination
+(<code>PTBIS &gt;= 0.4</code>).</p>
+<pre><code>CONDITION: DIFFICULTY &lt;= 0.3 || PTBIS &gt;= 0.4</code></pre></li>
+<li><p><strong>Nested conditions with sets</strong>: Select items where
+<code>STANDARD IN [1, 2, 3]</code> and the level is greater than 2.</p>
+<pre><code>CONDITION: STANDARD IN [1, 2, 3] &amp;&amp; LEVEL &gt; 2</code></pre></li>
+</ul>
+<p>Conditional sum constraints are a powerful tool for managing the
+distribution and balance of test attributes in an assembled form. These
+constraints ensure that the sum of a particular attribute (e.g.,
+<code>WORD_COUNT</code>, <code>DIFFICULTY</code>, or other item
+properties) for items that meet a specific condition remains within
+specified bounds.</p>
+<p>This approach is especially helpful in creating balanced test forms
+that meet specific requirements for areas like difficulty, length, topic
+coverage, and cognitive levels.</p>
+<hr />
+<h3 id="structure-of-conditional-sum-constraints">Structure of
+Conditional Sum Constraints</h3>
+<p>The general structure for specifying a conditional sum constraint in
+the <code>constraints.csv</code> file is as follows:</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 38%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C1</td>
+<td>Sum</td>
+<td>Item</td>
+<td><code>ATTRIBUTE, CONDITION_EXPR</code></td>
+<td>100</td>
+<td>200</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>CONSTRAINT_ID</strong>: A unique identifier for the
+constraint.</li>
+<li><strong>TYPE</strong>: Set to <code>Sum</code> to indicate a sum
+constraint.</li>
+<li><strong>WHAT</strong>: Specifies the unit, typically set to
+<code>Item</code>.</li>
+<li><strong>CONDITION</strong>: The core of a conditional sum
+constraint, defined as:
+<ul>
+<li><code>ATTRIBUTE</code>: The attribute to be summed across selected
+items (e.g., <code>WORD_COUNT</code>).</li>
+<li><code>CONDITION_EXPR</code>: An optional condition expression
+specifying which items to include in the sum.</li>
+</ul></li>
+<li><strong>LB</strong> and <strong>UB</strong>: The lower and upper
+bounds for the sum.</li>
+<li><strong>ONOFF</strong>: Turns the constraint on (<code>ON</code>) or
+off (<code>OFF</code>).</li>
+</ul>
+<hr />
+<h3 id="example-breakdown">Example Breakdown</h3>
+<p>Let’s walk through several examples to clarify how these conditional
+sum constraints work.</p>
+<hr />
+<h4 id="basic-sum-constraint-without-a-condition">1. Basic Sum
+Constraint Without a Condition</h4>
+<p>This is a simple sum constraint without conditions applied, meaning
+it sums an attribute across all items:</p>
+<table>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C1</td>
+<td>Sum</td>
+<td>Item</td>
+<td><code>WORD_COUNT</code></td>
+<td>500</td>
+<td>600</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Explanation</strong>: This constraint requires the total
+<code>WORD_COUNT</code> of all selected items to be between 500 and
+600.</li>
+<li><strong>Application</strong>: Every item’s <code>WORD_COUNT</code>
+attribute is included in the sum, regardless of any specific
+attributes.</li>
+</ul>
+<hr />
+<h4 id="conditional-sum-based-on-a-specific-attribute">2. Conditional
+Sum Based on a Specific Attribute</h4>
+<p>This example demonstrates applying a condition on a different
+attribute, such as <code>LEVEL</code>:</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 32%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C2</td>
+<td>Sum</td>
+<td>Item</td>
+<td><code>WORD_COUNT, LEVEL == 2</code></td>
+<td>300</td>
+<td>400</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Explanation</strong>: Here, the sum of
+<code>WORD_COUNT</code> for items where <code>LEVEL == 2</code> must
+fall between 300 and 400.</li>
+<li><strong>Application</strong>: Only items with <code>LEVEL</code>
+equal to 2 contribute their <code>WORD_COUNT</code> to the total
+sum.</li>
+</ul>
+<hr />
+<h4 id="combining-multiple-conditions-with-and">3. Combining Multiple
+Conditions with AND (<code>&amp;&amp;</code>)</h4>
+<p>When you need to impose a sum constraint on items that meet multiple
+criteria, you can combine conditions using <code>&amp;&amp;</code>:</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 45%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C3</td>
+<td>Sum</td>
+<td>Item</td>
+<td><code>WORD_COUNT, AREA == Math &amp;&amp; LEVEL &gt;= 3</code></td>
+<td>200</td>
+<td>500</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Explanation</strong>: The total <code>WORD_COUNT</code> of
+items in the Math area with <code>LEVEL &gt;= 3</code> must be between
+200 and 500.</li>
+<li><strong>Application</strong>: Only items meeting both conditions
+(<code>AREA == Math</code> and <code>LEVEL &gt;= 3</code>) are included
+in the sum.</li>
+</ul>
+<hr />
+<h4 id="conditional-sum-with-or-for-broader-selection">4. Conditional
+Sum with OR (<code>||</code>) for Broader Selection</h4>
+<p>When the conditions are less restrictive, using <code>||</code>
+allows items that meet at least one condition to contribute to the
+sum:</p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 52%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C4</td>
+<td>Sum</td>
+<td>Item</td>
+<td><code>WORD_COUNT, LEVEL == 2 || DIFFICULTY &lt; 0.4</code></td>
+<td>250</td>
+<td>400</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Explanation</strong>: This constraint sets the total
+<code>WORD_COUNT</code> for items with <code>LEVEL == 2</code> or
+<code>DIFFICULTY &lt; 0.4</code> to be between 250 and 400.</li>
+<li><strong>Application</strong>: Any item meeting at least one of the
+conditions is included in the sum.</li>
+</ul>
+<hr />
+<h4 id="advanced-conditional-sum-constraint-with-set-membership">5.
+Advanced Conditional Sum Constraint with Set Membership</h4>
+<p>Conditions can also specify that an attribute’s value belongs to a
+specific set, using <code>IN</code>:</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 46%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C5</td>
+<td>Sum</td>
+<td>Item</td>
+<td><code>POINTS, STANDARD IN [1, 2, 3]</code></td>
+<td>30</td>
+<td>50</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Explanation</strong>: The sum of <code>POINTS</code> for
+items where <code>STANDARD</code> is 1, 2, or 3 should be between 30 and
+50.</li>
+<li><strong>Application</strong>: Only items with <code>STANDARD</code>
+equal to 1, 2, or 3 contribute to the sum.</li>
+</ul>
+<hr />
+<h3
+id="practical-considerations-for-conditional-sum-constraints">Practical
+Considerations for Conditional Sum Constraints</h3>
+<ol type="1">
+<li><p><strong>Flexibility</strong>: Conditional sums offer precise
+control over various item attributes, useful for complex blueprints that
+may require balancing multiple dimensions (e.g., difficulty, content
+area).</p></li>
+<li><p><strong>Attribute Types</strong>: The attribute being summed
+(<code>ATTRIBUTE</code> in <code>ATTRIBUTE, CONDITION_EXPR</code>) can
+be quantitative (e.g., <code>WORD_COUNT</code>) but should match the
+type in <code>LB</code> and <code>UB</code> to avoid mismatched
+bounds.</p></li>
+<li><p><strong>Logical Operators</strong>: Combining conditions with
+<code>&amp;&amp;</code> and <code>||</code> allows for granular control
+but should be applied carefully to ensure constraints do not become too
+restrictive or overly lenient.</p></li>
+<li><p><strong>Bounds Settings</strong>: <code>LB</code> and
+<code>UB</code> can be equal for an exact match or set to a range for
+flexibility, ensuring that the sum remains within acceptable
+limits.</p></li>
+<li><p><strong>Turn Constraints On/Off</strong>: Setting
+<code>ONOFF</code> to <code>OFF</code> allows for easy toggling without
+deleting constraints. This is useful during testing or when reusing
+templates.</p></li>
+</ol>
+<p>In automated test assembly systems, certain constraints might
+conflict with one another. Conflict handling mechanisms are essential to
+ensure that the constraints do not contradict each other, which would
+make it impossible for the solver to find a solution that satisfies all
+requirements. In test assembly, conflicts can arise from different types
+of constraints, such as inclusion and exclusion rules or requirements
+about mutually exclusive items, and must be carefully handled to
+maintain consistency.</p>
+<h3 id="conflict-handling-strategy-in-constraints">Conflict Handling
+Strategy in Constraints</h3>
+<p>The conflict handling process involves identifying, managing, and
+resolving conflicting constraints so the test form satisfies the
+requirements without violating any rules. Here is an overview of the
+primary components and methods used to handle conflicts in
+constraints:</p>
+<hr />
+<h3 id="identifying-conflicting-constraints">1. <strong>Identifying
+Conflicting Constraints</strong></h3>
+<p>Constraints can conflict due to their fundamental definitions or the
+item selection conditions they impose. Key types of constraints that
+commonly cause conflicts include:</p>
+<ul>
+<li><p><strong>Mutually Exclusive (Enemy) Constraints</strong>:
+<code>ENEMIES</code> constraints specify that only one or none of the
+items in a specified set should be included in a form. Conflicts arise
+if there are other constraints that require multiple items from this set
+to be included together.</p></li>
+<li><p><strong>Inclusion/Exclusion Conflicts</strong>:
+<code>INCLUDE</code> constraints specify that specific items must always
+be included in a form, whereas <code>EXCLUDE</code> constraints dictate
+that certain items must always be excluded. Conflicts occur if an item
+is listed in both <code>INCLUDE</code> and <code>EXCLUDE</code>
+constraints for the same form.</p></li>
+<li><p><strong>All-Or-None Constraints</strong>: <code>ALLORNONE</code>
+constraints require either all items in a specified set to be included
+in the form or none at all. If other constraints conflict by requiring
+only some of these items to be included or excluded, this can lead to a
+conflict.</p></li>
+<li><p><strong>Conditional Constraints</strong>: Conditions based on
+specific item attributes (e.g., difficulty level or content area) can
+also create conflicts if they overlap or contradict each other in ways
+that make it impossible for the system to satisfy both
+simultaneously.</p></li>
+</ul>
+<hr />
+<h3 id="mechanism-for-conflict-detection">2. <strong>Mechanism for
+Conflict Detection</strong></h3>
+<p>The system typically uses a conflict detection mechanism that
+iteratively checks each pair or set of constraints to see if they can be
+satisfied simultaneously. This mechanism may involve:</p>
+<ul>
+<li><p><strong>Conflict Matrices</strong>: Represent relationships among
+constraints to efficiently identify any conflicting pairs or
+groups.</p></li>
+<li><p><strong>Conflict Rules</strong>: Apply predefined logic (e.g.,
+only one item from an <code>ENEMIES</code> group can be included) to
+detect situations where constraints cannot be satisfied
+together.</p></li>
+</ul>
+<p>The detection system flags constraints that, when applied together,
+would violate the conditions specified. This process helps maintain a
+record of constraints that may need adjustments.</p>
+<hr />
+<h3 id="resolving-conflicts">3. <strong>Resolving
+Conflicts</strong></h3>
+<p>Once conflicts are detected, the next step is to resolve them. This
+can involve:</p>
+<ul>
+<li><p><strong>Prioritizing Constraints</strong>: Some systems use a
+priority scheme, where more critical constraints (such as blueprint
+compliance) are prioritized over others (like soft content preferences).
+Lower-priority constraints may be relaxed if they conflict with
+high-priority ones.</p></li>
+<li><p><strong>Applying Conditional Logic</strong>: In cases where
+conflicts arise from attribute-based constraints, applying logical
+conditions can help by introducing dependencies. For example, an
+<code>INCLUDE</code> constraint could be relaxed for items in an
+<code>ENEMIES</code> group when an alternative condition (like a high
+difficulty level) is also met.</p></li>
+<li><p><strong>Error Logging and Feedback</strong>: The system can log
+conflicts, notifying the user of the conflicting constraints so they can
+adjust the requirements manually if necessary. This approach is helpful
+in complex setups where manual intervention is beneficial.</p></li>
+</ul>
+<hr />
+<h3 id="types-of-conflict-checks-and-examples">4. <strong>Types of
+Conflict Checks and Examples</strong></h3>
+<h4 id="a.-friends-enemies-conflict">a. <strong>Friends-Enemies
+Conflict</strong></h4>
+<p>This check ensures that <code>ALLORNONE</code> constraints (friends)
+do not conflict with <code>ENEMIES</code> constraints. The conflict
+check might follow these rules: - If any item is selected from a friends
+group, then all items in that group must be selected. - If an item from
+a friends group appears in an enemies group, there must be logic to
+handle cases where both constraints cannot be satisfied
+simultaneously.</p>
+<p>For example, consider the following constraints:</p>
+<ul>
+<li><code>C1</code>: <code>ALLORNONE</code> – Items A, B, and C must
+either all be included or none at all.</li>
+<li><code>C2</code>: <code>ENEMIES</code> – Only one of items B or C can
+be included.</li>
+</ul>
+<p>Here, <code>C1</code> and <code>C2</code> conflict because
+<code>C1</code> requires B and C to be selected together, while
+<code>C2</code> restricts them from appearing together. The conflict
+detection system would flag this issue.</p>
+<h4 id="b.-anchor-conflicts">b. <strong>Anchor Conflicts</strong></h4>
+<p>Anchor constraints often specify items that are “fixed” across forms.
+Conflict checks between <code>ALLORNONE</code> and <code>ENEMIES</code>
+constraints ensure that anchor items do not violate these rules when
+they appear in multiple forms.</p>
+<p>For example:</p>
+<ul>
+<li><code>C3</code>: <code>ALLORNONE</code> – Anchor items D and E must
+both be present or absent.</li>
+<li><code>C4</code>: <code>ENEMIES</code> – Items D and E should not
+appear together in any form.</li>
+</ul>
+<p>This would also raise a conflict, as these two rules cannot be
+applied simultaneously without violating one of the conditions.</p>
+<hr />
+<h3 id="conflict-resolution-example">5. <strong>Conflict Resolution
+Example</strong></h3>
+<p>In practice, here’s how the system might resolve a typical conflict
+between <code>INCLUDE</code> and <code>EXCLUDE</code> constraints:</p>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 14%" />
+<col style="width: 10%" />
+<col style="width: 30%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>WHAT</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C5</td>
+<td>INCLUDE</td>
+<td>Item</td>
+<td><code>ID == 'Q1'</code></td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>C6</td>
+<td>EXCLUDE</td>
+<td>Item</td>
+<td><code>ID == 'Q1'</code></td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<p>Since item <code>Q1</code> cannot simultaneously be included and
+excluded, the system would:</p>
+<ul>
+<li>Flag this conflict for manual review, notifying the user.</li>
+<li>Log the conflict for debugging or documentation purposes.</li>
+<li>Potentially prioritize one constraint over the other, based on
+settings, or disable one if required.</li>
+</ul>
+<hr />
+<h3 id="best-practices-for-avoiding-conflicts">Best Practices for
+Avoiding Conflicts</h3>
+<ul>
+<li><strong>Unique Item Grouping</strong>: Avoid assigning items to
+conflicting groups (e.g., do not place the same item in both
+<code>ENEMIES</code> and <code>ALLORNONE</code> constraints).</li>
+<li><strong>Careful Condition Design</strong>: When creating
+attribute-based conditions, ensure they are distinct and non-overlapping
+whenever possible.</li>
+<li><strong>Logical Grouping</strong>: Group items logically based on
+content, difficulty, and test specifications to reduce the chance of
+contradictory rules.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>Conflict handling in constraints is crucial for successful automated
+test assembly. By systematically detecting, logging, and resolving
+conflicts, the system can maintain a consistent and feasible set of
+requirements for test forms. Properly defining constraints, reviewing
+conflicts, and using conditional logic where appropriate help minimize
+potential conflicts, allowing for smoother and more reliable form
+assembly.</p>
+<hr />
+<h3 id="notes-on-usage">Notes on Usage</h3>
+<ol type="1">
+<li><strong>Testing Configurations</strong>: Before full-scale assembly,
+test the constraints configuration on a small subset of items to ensure
+it behaves as expected.</li>
+<li><strong>Prioritizing Constraints</strong>: Since this system doesn’t
+use weights, prioritize constraints by their order in the CSV if
+necessary.</li>
+<li><strong>Debugging Tips</strong>:
+<ul>
+<li>Use unique <code>CONSTRAINT_ID</code>s for easy tracking.</li>
+<li>Use the <code>ONOFF</code> column to toggle constraints without
+needing to delete rows.</li>
+<li>When debugging complex conditions, simplify conditions in the
+<code>CONDITION</code> column to verify individual parts.</li>
+</ul></li>
+</ol>
+
+</body>
+</html>

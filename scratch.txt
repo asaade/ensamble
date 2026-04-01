@@ -1,0 +1,155 @@
+;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with C-x C-f and enter text in its buffer.
+
+bank = DataFrame(
+           ID = ["Item1", "Item2", "Item3"],
+           MODEL = ["3PL", "GPCM", "GRM"],
+           A = [1.0, 1.2, 0.8],
+           C = [0.25, missing, missing],
+           B = [0.0, missing, missing],
+           B1 = [missing, 0.5, -1.0],
+           B2 = [missing, 1.0, 0.0],
+           B3 = [missing, missing, 1.0]
+       )
+
+bank.NUM_CATEGORIES .= 0
+b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
+
+#b_columns = String.(b_columns)
+
+for row in eachrow(bank)
+      row.NUM_CATEGORIES = length(collect(skipmissing(row[b_columns]))) + 1
+endfunction expected_score_item(a, bs, c, model, θ; D = 1.0)
+    if model in SUPPORTED_DICHOTOMOUS_MODELS
+        expected_score = prob_3pl(a, bs[1], c, θ; D = D)
+    elseif model == "PCM"
+        expected_score = expected_score_pcm(a, bs, θ; D = D)
+    elseif model == "GPCM"
+        expected_score = expected_score_gpcm(a, bs, θ; D = D)
+    elseif model == "GRM"
+        expected_score = expected_score_grm(a, bs, θ; D = D)
+    else
+        error("Unsupported model: $model")
+    end
+    return expected_score
+end
+
+
+
+
+
+
+bank.CHECK::Vector{Union{Missing, Bool}} .= true
+
+
+
+
+
+
+
+
+"""
+    irt_params(bank, idx) -> Tuple{Float64, Union{Float64, Vector{Float64}}, Union{Float64, Nothing}, String}
+
+Extracts IRT parameters (discrimination `a`, difficulty `bs`, guessing `c`, and model type)
+for a specified item index from an item bank DataFrame.
+
+# Arguments
+
+  - `bank::DataFrame`: A DataFrame containing IRT item parameters.
+  - `idx::Int`: Index of the item to extract parameters for.
+
+# Returns
+
+  - `Tuple{Float64, Union{Float64, Vector{Float64}}, Union{Float64, Nothing}, String}`: A tuple containing
+    the discrimination (`a`), difficulty parameters (`bs` as `Float64` or `Vector{Float64}`), guessing parameter (`c`),
+    and the model type as a string.
+"""
+function irt_params2(bank::DataFrame, idx::Int)
+    model = bank[idx, :MODEL]
+    a = if model == "RASCH"
+        1.0
+    else
+        bank[idx, :A]
+    end
+
+    # Set c to 0.0 for non-3PL models to ensure consistent type handling as Float64
+    c = if model == "3PL"
+        bank[idx, :C]
+    else
+        0.0  # Set to 0.0 for all other models
+    end
+
+    # Extracting difficulty parameters (bs)
+    b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
+    bs_values = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+
+    # Ensure bs is always a vector, even for dichotomous models
+    bs = if model in SUPPORTED_DICHOTOMOUS_MODELS && length(bs_values) == 1
+        [bs_values[1]]  # Wrap single value in a vector
+    else
+        bs_values  # Already a vector for polytomous models
+    end
+
+    return a, bs, c, model
+end
+
+
+function expected_score_item(a, bs, c, model, θ; D = 1.0)
+    if model in SUPPORTED_DICHOTOMOUS_MODELS
+        expected_score = prob_3pl(a, bs[1], c, θ; D = D)
+    elseif model == "PCM"
+        expected_score = expected_score_pcm(a, bs, θ; D = D)
+    elseif model == "GPCM"
+        expected_score = expected_score_gpcm(a, bs, θ; D = D)
+    elseif model == "GRM"
+        expected_score = expected_score_grm(a, bs, θ; D = D)
+    else
+        error("Unsupported model: $model")
+    end
+    return expected_score
+end
+
+
+
+
+
+
+using DataFrames
+
+# Sample item bank with dichotomous (3PL) and polytomous (PCM) items
+item_bank = DataFrame(
+    ID = ["item1", "item2", "item3", "item4"],
+    MODEL = ["3PL", "PCM", "PCM", "3PL"],
+    A = [1.2, 1.0, 0.9, 1.5],  # Discrimination parameters
+    C = [0.2, 0.0, 0.0, 0.25],  # Guessing parameters for 3PL, set to 0.0 for PCM
+    B1 = [-0.5, 0.0, 0.5, -1.0],  # Difficulty parameters
+    B2 = [missing, 1.0, 1.5, missing],  # Additional parameters for PCM
+    B3 = [missing, 2.0, 2.5, missing],  # Additional parameters for PCM
+)
+
+# Sample theta values (range of abilities)
+theta_values = collect(-3.0:0.5:3.0)
+
+# Example results DataFrame (forms with item IDs)
+results = DataFrame(Form1 = ["item1", "item2", "item3", missing], Form2 = ["item3", "item4", missing, missing])
+
+# Parameters structure (mocked for this example)
+struct Parameters
+    bank::DataFrame
+    D::Float64
+end
+
+parms = Parameters(item_bank, 1.0)
+
+# Calculate expected score curves
+expected_scores = expected_score_curves(parms, results, theta_values)
+
+# Calculate expected information curves
+expected_information = expected_info_curves(parms, results, theta_values)
+
+# Display the results
+println("Expected Score Curves:")
+println(expected_scores)
+println("\nExpected Information Curves:")
+println(expected_information)

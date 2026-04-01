@@ -1,0 +1,49 @@
+.
+├── data
+│  ├── anchor.csv
+│  ├── config.toml
+│  ├── constraints.csv
+│  ├── items.csv
+│  ├── model.lp
+│  ├── report.jmd
+│  └── solver_config.toml
+├── docs
+│  ├── next_steps.md
+│  └── structure.txt
+├── LICENSE
+├── Manifest.toml
+├── Project.toml
+├── README.md
+├── results
+│  ├── combined_plot.pdf
+│  ├── forms.csv
+│  ├── model.lp
+│  ├── results.csv
+│  ├── tcc_output.csv
+│  └── test_assembly_report.txt
+├── src
+│  ├── ensamble.jl
+│  ├── constants.jl
+│  ├── config
+│  │  ├── assembly_config_loader.jl
+│  │  ├── bank_data_loader.jl
+│  │  ├── config_loader.jl
+│  │  ├── configuration.jl
+│  │  ├── irt_data_loader.jl
+│  │  └── validation.jl
+│  ├── display
+│  │  ├── charts.jl
+│  │  └── display_results.jl
+│  ├── model
+│  │  ├── constraints.jl
+│  │  ├── criteria_parser.jl
+│  │  ├── model_initializer.jl
+│  │  └── solvers.jl
+│  └── utils
+│     ├── custom_logger.jl
+│     ├── polytomous.md
+│     ├── stats_functions.jl
+│     ├── string_utils.jl
+│     └── utils.jl
+└── tests
+   └── test_parser.jl

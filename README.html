@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>README.html</title>
+<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
+<link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"  />
+<link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css"  /><meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'><style> body { box-sizing: border-box; max-width: 740px; width: 100%; margin: 40px auto; padding: 0 10px; } </style><script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script><script src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script><script>document.addEventListener('DOMContentLoaded', () => { document.body.classList.add('markdown-body'); document.querySelectorAll('pre[lang] > code').forEach((code) => { code.classList.add(code.parentElement.lang); }); document.querySelectorAll('pre > code').forEach((code) => { hljs.highlightBlock(code); }); });</script>
+</head>
+
+<body>
+
+<h1>Ensamble.jl</h1>
+<p><strong>Automated Test Assembly (ATA) in Julia using Mixed Integer Programming (MIP)</strong></p>
+<p>Ensamble.jl is a Julia-based ATA tool that integrates <strong>Item Response Theory (IRT)</strong> with <strong>Mixed Integer Programming</strong>. It generates balanced, comparable test forms under various constraints—ensuring content coverage, difficulty alignment, and fair distribution of items across multiple forms.</p>
+<h2>Key Features</h2>
+<ul>
+<li><p><strong>Optimized Test Assembly</strong><br>Automatically create standardized forms that meet target criteria (e.g., item difficulty, content, test length).</p>
+</li>
+<li><p><strong>Flexible Constraints</strong><br>Handle a wide variety of constraints (content, difficulty, anchor items, and more) through a user-defined configuration.</p>
+</li>
+<li><p><strong>Multi-Solver Compatibility</strong><br>Works with CPLEX, Gurobi, HiGHS, SCIP, GLPK, and others.</p>
+</li>
+<li><p><strong>Shadow Tests &amp; Anchor Items</strong></p>
+<ul>
+<li><strong>Shadow tests</strong> preserve item pools for subsequent assemblies, allowing iterative form-building.</li>
+<li><strong>Anchor items</strong> are predefined items appearing in multiple operational forms to ensure score comparability.</li>
+</ul>
+</li>
+<li><p><strong>Reporting</strong><br>Generates charts (Test Characteristic and Information Curves) and summary reports (e.g., number of items by category, anchor usage, expected scores).</p>
+</li>
+</ul>
+<h2>Why Julia + JuMP?</h2>
+<p>Julia is a high-performance language well-suited for scientific computing and large-scale optimization. Its syntax is close to mathematical notation, making it intuitive for modeling.<br><strong>JuMP</strong>, a Julia-based optimization layer, makes constraint definitions straightforward and integrates seamlessly with high-performance solvers (e.g., Gurobi, CPLEX, HiGHS, GLPK).</p>
+<h2>Supported Assembly Methods</h2>
+<ul>
+<li><strong>Test Characteristic Curve (TCC)</strong><br>Matches item-based curves to a reference test, enabling consistent expected scores across forms.</li>
+<li><strong>Test Information Curve (TIC)</strong><br>Maximizes measurement precision at specified ability levels.</li>
+</ul>
+<p>Both methods can be combined or extended (e.g., TCC + TIC, multi-point optimization) for specialized needs.</p>
+<h2>Configuration Overview</h2>
+<p>All assembly rules and file paths reside in a <code>config.toml</code> file, which includes:</p>
+<ul>
+<li><strong>[FORMS]</strong><br>Number of forms, anchor test details, and whether shadow tests are used.</li>
+<li><strong>[IRT]</strong><br>Assembly method (TCC/TIC), the ability levels (<code>THETA</code>) to target, and whether to match expected scores or information curves.</li>
+<li><strong>[FILES]</strong><br>Paths for item banks, anchor items, constraints, and output files.</li>
+<li><strong>[SOLVER]</strong><br>Desired solver (e.g., <code>cplex</code>, <code>highs</code>) and verbosity level.</li>
+</ul>
+<h3>Example <code>config.toml</code></h3>
+<pre><code class="language-toml">[FORMS]
+NumForms = 4
+AnchorTests = 2
+ShadowTest = 1
+
+[IRT]
+METHOD = &quot;TCC&quot;
+THETA = [-2.5, -0.5, 0.0, 0.5, 2.5]
+TAU = []
+TAU_INFO = []
+R = 3
+D = 1.0
+
+[FILES]
+ITEMSFILE = &quot;data/items.csv&quot;
+ANCHORFILE = &quot;data/anchor.csv&quot;
+CONSTRAINTSFILE = &quot;data/constraints.csv&quot;
+RESULTSFILE = &quot;results/results.csv&quot;
+FORMSFILE = &quot;results/forms.csv&quot;
+TCCFILE = &quot;results/tcc_output.csv&quot;
+PLOTFILE = &quot;results/plot_output.png&quot;
+REPORTCATEGORIES = [&quot;CONTENT&quot;,&quot;LEVEL&quot;]
+REPORTSUMS = [&quot;WORDS&quot;,&quot;IMAGES&quot;]
+
+SOLVER = &quot;cplex&quot;
+VERBOSE = 1
+</code></pre>
+<h2>Constraint Format</h2>
+<p>A CSV file (e.g., <code>constraints.csv</code>) defines additional constraints (e.g., test length, item groupings, all-or-none rules). Here’s an example:</p>
+<table>
+<thead>
+<tr>
+<th>CONSTRAINT_ID</th>
+<th>TYPE</th>
+<th>CONDITION</th>
+<th>LB</th>
+<th>UB</th>
+<th>ONOFF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>C1</td>
+<td>TEST</td>
+<td></td>
+<td>30</td>
+<td>30</td>
+<td>ON</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>NUMBER</td>
+<td>LEVEL == 3</td>
+<td>10</td>
+<td>10</td>
+<td>ON</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>SUM</td>
+<td>WORDS, LEVEL==1</td>
+<td>50</td>
+<td>80</td>
+<td>ON</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>ALLORNONE</td>
+<td>ID IN [101,102]</td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>ENEMIES</td>
+<td>ENEMIES</td>
+<td></td>
+<td></td>
+<td>ON</td>
+</tr>
+</tbody></table>
+<h2>Running the Assembly</h2>
+<ol>
+<li><strong>Prepare Items</strong><br>Provide a CSV with item parameters and attributes.</li>
+<li><strong>Set Constraints</strong><br>Edit <code>config.toml</code> and <code>constraints.csv</code>.</li>
+<li><strong>Execute in Julia</strong><pre><code class="language-julia">include(&quot;src/ensamble.jl&quot;)
+using .Ensamble
+results = Ensamble.assemble_tests(&quot;data/config.toml&quot;)
+</code></pre>
+</li>
+</ol>
+<h2>Output Files</h2>
+<ul>
+<li><strong>Results</strong>: <code>results.csv</code> and <code>forms.csv</code></li>
+<li><strong>Plots &amp; TCC Data</strong>: <code>tcc_output.csv</code>, <code>plot_output.png</code></li>
+<li><strong>Reports</strong>: Summaries by category, anchor usage, etc.</li>
+</ul>
+<h2>Supported Solvers</h2>
+<ul>
+<li><strong>CPLEX</strong> (commercial)</li>
+<li><strong>Gurobi</strong> (commercial)</li>
+<li><strong>HiGHS</strong>, <strong>Cbc</strong>, <strong>SCIP</strong>, <strong>GLPK</strong> (open source)</li>
+</ul>
+<p>Adjust <code>SOLVER</code> in your config file to switch between them.</p>
+<hr>
+<p>For more details, see the complete documentation in:</p>
+<ul>
+<li><a href="docs/configuration.md"><code>docs/configuration.md</code></a>.</li>
+<li><a href="docs/constraints.md"><code>docs/constraints.md</code></a>.</li>
+<li><a href="docs/structure.md"><code>docs/structure.md</code></a>.</li>
+</ul>
+
+
+</body>
+</html>
