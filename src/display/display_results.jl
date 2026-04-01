@@ -209,6 +209,42 @@ function final_summary(parms::Parameters, results::DataFrame)::String
 end
 
 """
+    psychometric_summary(parms, results; theta_points=[-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0]) -> String
+
+Returns a table summarizing psychometric properties (Expected Score, Information, SEM) for each form at specific theta points.
+"""
+function psychometric_summary(
+        parms::Parameters, results::DataFrame;
+        theta_points=[-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0]
+)::String
+    check_empty!(results)
+
+    # Calculate curves
+    score_data = expected_score_curves(parms, results, theta_points)
+    info_data = expected_info_curves(parms, results, theta_points)
+
+    num_forms = size(results, 2)
+    table_data = []
+
+    for (i, theta) in enumerate(theta_points)
+        scores = [round(score_data[i, j], digits=2) for j in 1:num_forms]
+        infos = [round(info_data[i, j], digits=2) for j in 1:num_forms]
+        sems = [round(1.0 / sqrt(max(info_data[i, j], 1e-6)), digits=2) for j in 1:num_forms]
+
+        push!(table_data, vcat([string(theta), "Expected Score"], scores))
+        push!(table_data, vcat(["", "Information"], infos))
+        push!(table_data, vcat(["", "SEM"], sems))
+    end
+
+    header = vcat(["Theta", "Metric"], ["Form $i" for i in 1:num_forms])
+    table_matrix = permutedims(hcat(table_data...))
+
+    return pretty_table(
+        String, table_matrix; column_labels=header, alignment=:r
+    )
+end
+
+"""
     tolerances_table(tols) -> String
 
 Returns a table of tolerances for each form.
@@ -255,6 +291,7 @@ function gather_tables(
 
     tables["Common items"] = common_items(results)
     tables["Tolerances"] = tolerances_table(tols)
+    tables["Psychometric Properties"] = psychometric_summary(parms, results)
 
     return tables
 end
@@ -328,6 +365,11 @@ function generate_report(report_data::Dict{String, String})::String
     if haskey(report_data, "Column sums")
         report *= "Column Sums\n"
         report *= report_data["Column sums"] * "\n\n"
+    end
+
+    if haskey(report_data, "Psychometric Properties")
+        report *= "Psychometric Properties\n"
+        report *= report_data["Psychometric Properties"] * "\n\n"
     end
 
     return report
