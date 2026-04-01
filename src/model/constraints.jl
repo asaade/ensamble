@@ -73,7 +73,7 @@ function group_by_selected(selected::Union{Vector,BitVector})
     elseif eltype(data.selection) <: Number
         data = data[(!ismissing).(data.selection).|(data.selection.>0), :]
     end
-    return groupby(data, :selected; skipmissing=true)
+    return groupby(data, :selection; skipmissing=true)
 end
 
 # ---------------------------------------------------------------------------
