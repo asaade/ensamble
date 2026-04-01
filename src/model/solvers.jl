@@ -40,6 +40,8 @@ end
 Configures the specified optimization solver in JuMP based on the input solver name and the
 settings in the `solver_config.toml` file. It supports solvers like CPLEX, CBC, GLPK, Gurobi, HiGHS,
 and SCIP. It also sets various options, including the verbosity and time limits, for the solver.
+The path to the solver configuration can be customized by setting the `SOLVER_CONFIG_PATH`
+environment variable. It defaults to `data/solver_config.toml`.
 
 # Arguments
 
@@ -53,7 +55,9 @@ and SCIP. It also sets various options, including the verbosity and time limits,
 """
 function configure_solver!(model::Model, parms::Parameters, solver_name::String = "cbc")
     parms.verbose > 1 && @info "Configuring $solver_name solver."
-    config = load_solver_config("data/solver_config.toml")
+
+    config_path = get(ENV, "SOLVER_CONFIG_PATH", "data/solver_config.toml")
+    config = load_solver_config(config_path)
     solver_options = config[lowercase(solver_name)]
 
     name = upSymbol(solver_name)
