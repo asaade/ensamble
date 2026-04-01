@@ -358,7 +358,6 @@ function combine_plots(
     )
 
     # # Combine plots into a single layout with consistent sizes
-    # plot(p1, p2, p3; layout=(2, 2), size=(950, 850), margin=8mm)
     return plot(p1, p2, p3; layout = (2, 2), size = (950, 850), margin = 8mm)
 end
 
