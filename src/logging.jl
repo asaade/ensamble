@@ -8,9 +8,25 @@ const LOG_LEVELS = Dict(
     "ERROR" => Logging.Error
 )
 
+const CURRENT_LOG_STREAM = Ref{Union{IOStream, Nothing}}(nothing)
+
+function _close_log_stream()
+    if CURRENT_LOG_STREAM[] !== nothing && isopen(CURRENT_LOG_STREAM[])
+        close(CURRENT_LOG_STREAM[])
+    end
+    CURRENT_LOG_STREAM[] = nothing
+end
+
+function __init__()
+    atexit(_close_log_stream)
+end
+
 function setup_logger(level::String = "INFO", log_file::String = "ata.log")
+    _close_log_stream()
+    io = open(log_file, "a")
+    CURRENT_LOG_STREAM[] = io
     logger = SimpleLogger(
-        open(log_file, "a"),
+        io,
         get(LOG_LEVELS, uppercase(level), Logging.Info)
     )
     return global_logger(logger)
