@@ -8,6 +8,7 @@ using JuMP
 using DataFrames
 using Logging
 using PrettyTables
+using PrecompileTools
 
 include("constants.jl")
 
@@ -237,6 +238,19 @@ function assemble_tests(config_file::String = "data/config.toml")::DataFrame
     write("results/test_assembly_report.txt", report)
 
     return results_df
+end
+
+@setup_workload begin
+    config_file = joinpath(dirname(@__DIR__), "data", "config.toml")
+    @compile_workload begin
+        if isfile(config_file)
+            try
+                assemble_tests(config_file)
+            catch e
+                @warn "Precompilation workload failed" exception=(e, catch_backtrace())
+            end
+        end
+    end
 end
 
 end  # module Ensamble

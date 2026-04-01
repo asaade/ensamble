@@ -2,7 +2,7 @@
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "31ba2580e6a6a1668e813640a1cdf0d3f50e9870"
+project_hash = "bc24cdf74698134a5759595ec2b611497fad7d44"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -460,6 +460,12 @@ deps = ["Base64", "Markdown", "REPL"]
 git-tree-sha1 = "cb7b7566bf111c029c34dcec16141ab8b3292213"
 uuid = "b2ad6718-fff2-47f2-82f8-4d98a2866c7e"
 version = "0.3.0"
+
+[[deps.Ensamble]]
+deps = ["CPLEX", "CSV", "Cbc", "DataFrames", "Dates", "Distributions", "DocStringExtensions", "EmacsVterm", "FastGaussQuadrature", "HiGHS", "JuMP", "JuliaFormatter", "LanguageServer", "Measures", "PackageCompiler", "Plots", "PrettyTables", "QuadGK", "Revise", "SCIP", "StatsBase", "StatsFuns", "StatsPlots", "StringDistances", "TOML", "ThreadsX", "YAML"]
+path = "."
+uuid = "43c0d8f0-1e5f-4a0b-857e-00ec21c1722e"
+version = "0.1.0"
 
 [[deps.EpollShim_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
