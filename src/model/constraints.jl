@@ -48,7 +48,7 @@ function operational_forms(x, shadow_test_size::Int)
 end
 
 """
-    group_by_selected(selected::Union{Vector, BitVector}) where {T}
+    group_by_selected(selected::AbstractVector)
 
 Group items based on the `selected` items vector, ignoring missing values.
 
@@ -58,22 +58,29 @@ Group items based on the `selected` items vector, ignoring missing values.
 
 # Returns
 
-  - A `GroupedDataFrame` where each group corresponds to a unique value in `selected`.
+  - A `Vector{Vector{Int}}` where each sub-vector contains the indices of items in the same group.
 
 # Notes
 
   - Missing values and items not satisfying the selection criteria are excluded.
 """
-function group_by_selected(selected::Union{Vector,BitVector})
-    data = DataFrame(; selection=selected, index=1:length(selected))
-    if isa(selected, BitVector)
-        data = data[data.selection, :]
-    elseif eltype(data.selection) <: AbstractString
-        data = data[data.selection.!==missing, :]
-    elseif eltype(data.selection) <: Number
-        data = data[(!ismissing).(data.selection).|(data.selection.>0), :]
+function group_by_selected(selected::AbstractVector)
+    groups = Dict{Any, Vector{Int}}()
+    for (i, val) in enumerate(selected)
+        if ismissing(val)
+            continue
+        end
+        if val isa Bool
+            val ? push!(get!(groups, val, Int[]), i) : nothing
+        elseif val isa Number
+            val > 0 ? push!(get!(groups, val, Int[]), i) : nothing
+        elseif val isa AbstractString
+            strip(val) != "" ? push!(get!(groups, val, Int[]), i) : nothing
+        else
+            push!(get!(groups, val, Int[]), i)
+        end
     end
-    return groupby(data, :selection; skipmissing=true)
+    return collect(values(groups))
 end
 
 # ---------------------------------------------------------------------------
@@ -113,7 +120,7 @@ end
     constraint_item_count(
         model::Model,
         parms::Parameters,
-        selected::BitVector,
+        selected::AbstractVector,
         minItems::Int,
         maxItems::Int = minItems
     )::Model
@@ -132,12 +139,12 @@ Ensure the number of selected items falls within specified bounds in each form.
 
   - The updated `Model` with the new constraints.
 """
-function constraint_item_count(model::Model, parms::Parameters, selected::Union{Vector, BitVector},
+function constraint_item_count(model::Model, parms::Parameters, selected::AbstractVector,
     minItems::Int, maxItems::Int=minItems)
     @assert(minItems <= maxItems, "Error in item_count: maxItems < MinItems")
 
     x = model[:x]
-    items = collect(1:size(x, 1))[selected]
+    items = findall(x -> isequal(x, true), selected)
     forms = operational_forms(x, parms.shadow_test_size)
 
     # Constraints for operational forms
@@ -177,7 +184,7 @@ end
     constraint_score_sum(
         model::Model,
         parms::Parameters,
-        selected::BitVector,
+        selected::AbstractVector,
         minScore::Int64,
         maxScore::Int64 = minScore
     )::Model
@@ -196,14 +203,13 @@ Ensure the sum of selected item scores is within `minScore` and `maxScore` for e
 
   - The updated `Model` with the new constraints.
 """
-function constraint_score_sum(model::Model, parms::Parameters, selected::Union{Vector, BitVector}, minScore::Int64, maxScore::Int64=minScore)
+function constraint_score_sum(model::Model, parms::Parameters, selected::AbstractVector, minScore::Int64, maxScore::Int64=minScore)
     @assert(minScore <= maxScore, "Error in item_score_sum: maxScore < minScore")
 
     x = model[:x]
 
-    # Convert 'selected' to Vector{Bool} (for Any or BitVector)
-    mask = convert(Vector{Bool}, selected)
-    items = axes(x, 1)[mask]
+    # Convert 'selected' securely without type issues
+    items = findall(x -> isequal(x, true), selected)
     forms = operational_forms(x, parms.shadow_test_size)
 
     # Calculate scores based on num_categories in Parameters
@@ -332,7 +338,7 @@ end
     constraint_friends_in_form(
         model::Model,
         parms::Parameters,
-        selected::Union{Vector, BitVector}
+        selected::AbstractVector
     )::Model
 
 Ensure that friend items are assigned to the same form.
@@ -347,13 +353,12 @@ Ensure that friend items are assigned to the same form.
 
   - The updated `Model` with the new constraints.
 """
-function constraint_friends_in_form(model::Model, parms::Parameters, selected::Union{Vector, BitVector})
+function constraint_friends_in_form(model::Model, parms::Parameters, selected::AbstractVector)
     x = model[:x]
     forms = operational_forms(x, parms.shadow_test_size)
     groups = group_by_selected(selected)
 
-    for group in groups
-        items = group[!, :index]
+    for items in groups
         pivot = items[1]  # Reference item
         cnt = length(items)
 
@@ -368,7 +373,7 @@ end
     constraint_enemies(
         model::Model,
         parms::Parameters,
-        selected::Union{Vector, BitVector}
+        selected::AbstractVector
     )::Model
 
 Ensure that only one enemy item is assigned to the same form.
@@ -383,20 +388,18 @@ Ensure that only one enemy item is assigned to the same form.
 
   - The updated `Model` with the new constraints.
 """
-function constraint_enemies(model::Model, parms::Parameters, selected::Union{Vector, BitVector})
+function constraint_enemies(model::Model, parms::Parameters, selected::AbstractVector)
     x = model[:x]
     forms = operational_forms(x, parms.shadow_test_size)
 
-    if isa(selected, BitVector)
-        items = 1:size(x, 1)
-        items = items[selected]
+    if eltype(selected) <: Union{Bool, Missing}
+        items = findall(x -> isequal(x, true), selected)
         if length(items) > 1
             @constraint(model, [f = 1:forms], sum(x[i, f] for i in items) <= 1)
         end
     else
         groups = group_by_selected(selected)
-        for group in groups
-            items = group[!, :index]
+        for items in groups
             @constraint(model, [f = 1:forms], sum(x[i, f] for i in items) <= 1)
         end
     end
@@ -405,7 +408,7 @@ end
 """
     constraint_exclude_items(
         model::Model,
-        exclude::BitVector
+        exclude::AbstractVector
     )::Model
 
 Exclude specified items from being selected in any form.
@@ -419,9 +422,9 @@ Exclude specified items from being selected in any form.
 
   - The updated `Model` with the items fixed to 0.
 """
-function constraint_exclude_items(model::Model, exclude::BitVector)
+function constraint_exclude_items(model::Model, exclude::AbstractVector)
     x = model[:x]
-    items = collect(1:size(x, 1))[exclude]
+    items = findall(x -> isequal(x, true), exclude)
     forms = size(x, 2)
 
     # Ensure no excluded items are selected
@@ -436,7 +439,7 @@ end
 """
     constraint_fix_items(
         model::Model,
-        fixed::BitVector
+        fixed::AbstractVector
     )::Model
 
 Force certain items to be included in every form.
@@ -450,9 +453,9 @@ Force certain items to be included in every form.
 
   - The updated `Model` with the items fixed to 1.
 """
-function constraint_fix_items(model::Model, fixed::BitVector)
+function constraint_fix_items(model::Model, fixed::AbstractVector)
     x = model[:x]
-    items = collect(1:size(x, 1))[fixed]
+    items = findall(x -> isequal(x, true), fixed)
     forms = size(x, 2)
 
     for i in items
@@ -503,7 +506,7 @@ end
     constraint_max_use(
         model::Model,
         parms::Parameters,
-        selected::BitVector
+        selected::AbstractVector
     )::Model
 
 Constrain the maximum number of times an item can appear across the test forms.
@@ -519,7 +522,7 @@ Constrain the maximum number of times an item can appear across the test forms.
   - The updated `Model` with the new constraints.
 """
 function constraint_max_use(
-    model::Model, parms::Parameters, selected::BitVector
+    model::Model, parms::Parameters, selected::AbstractVector
 )
     x = model[:x]
     forms = operational_forms(x, parms.shadow_test_size)
@@ -527,7 +530,7 @@ function constraint_max_use(
     max_use = parms.max_item_use
 
     if max_use < forms
-        selected_items = collect(1:size(x, 1))[selected]
+        selected_items = findall(x -> isequal(x, true), selected)
         non_anchor_items = filter(i -> ismissing(parms.bank.ANCHOR[i]), selected_items)
 
         @constraint(model,
