@@ -2,7 +2,7 @@
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "bc24cdf74698134a5759595ec2b611497fad7d44"
+project_hash = "ff6c4865affaed57412885c9c93e3c7e0efc5c99"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -131,9 +131,9 @@ version = "0.1.1"
 
 [[deps.BenchmarkTools]]
 deps = ["Compat", "JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
-git-tree-sha1 = "7fecfb1123b8d0232218e2da0c213004ff15358d"
+git-tree-sha1 = "6876e30dc02dc69f0613cb6ece242144f2ca9e56"
 uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
-version = "1.6.3"
+version = "1.7.0"
 
 [[deps.BitFlags]]
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
@@ -462,7 +462,7 @@ uuid = "b2ad6718-fff2-47f2-82f8-4d98a2866c7e"
 version = "0.3.0"
 
 [[deps.Ensamble]]
-deps = ["CPLEX", "CSV", "Cbc", "DataFrames", "Dates", "Distributions", "DocStringExtensions", "EmacsVterm", "FastGaussQuadrature", "HiGHS", "JuMP", "JuliaFormatter", "LanguageServer", "Measures", "PackageCompiler", "Plots", "PrettyTables", "QuadGK", "Revise", "SCIP", "StatsBase", "StatsFuns", "StatsPlots", "StringDistances", "TOML", "ThreadsX", "YAML"]
+deps = ["CPLEX", "CSV", "Cbc", "DataFrames", "Dates", "Distributions", "DocStringExtensions", "EmacsVterm", "FastGaussQuadrature", "HiGHS", "JuMP", "JuliaFormatter", "LanguageServer", "LinearAlgebra", "Logging", "Measures", "PackageCompiler", "Plots", "PrecompileTools", "PrettyTables", "Printf", "QuadGK", "Random", "Revise", "SCIP", "Statistics", "StatsBase", "StatsFuns", "StatsPlots", "StringDistances", "TOML", "ThreadsX", "YAML"]
 path = "."
 uuid = "43c0d8f0-1e5f-4a0b-857e-00ec21c1722e"
 version = "0.1.0"

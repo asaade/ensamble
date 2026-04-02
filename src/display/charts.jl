@@ -8,6 +8,7 @@ using Base.Threads
 using StatsBase
 
 using ..Configuration, ..Utils
+using ...Ensamble: B_REGEX
 
 """
     irt_params(bank, idx) -> Tuple{Float64, Union{Float64, Vector{Float64}}, Union{Float64, Nothing}, String}
@@ -26,7 +27,7 @@ for a specified item index from an item bank DataFrame.
     the discrimination (`a`), difficulty parameters (`bs` as `Float64` or `Vector{Float64}`), guessing parameter (`c`),
     and the model type as a string.
 """
-function irt_params(bank::DataFrame, idx::Int)
+function irt_params(bank::DataFrame, idx::Int, b_cols::Vector{Symbol})
     model = bank[idx, :MODEL]
     a = if model == "RASCH"
         1.0
@@ -42,8 +43,7 @@ function irt_params(bank::DataFrame, idx::Int)
     end
 
     # Extracting difficulty parameters (bs)
-    b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
-    bs_values = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+    bs_values = [bank[idx, col] for col in b_cols if !ismissing(bank[idx, col])]
 
     # Ensure bs is always a vector, even for dichotomous models
     bs = if model in SUPPORTED_DICHOTOMOUS_MODELS && length(bs_values) == 1
@@ -85,6 +85,8 @@ function simulate_scores(
     total_scores_list = Vector{Vector{Float64}}()
     max_total_score = 0
 
+    b_cols = Symbol.(filter(col -> occursin(B_REGEX, string(col)), names(bank)))
+
     for form in 1:n_forms
         # Extract item IDs for the current form
         items = skipmissing(results[:, form])
@@ -94,7 +96,7 @@ function simulate_scores(
                      for item_id in items if haskey(id_to_index, item_id)]
 
         # Extract parameters for selected items
-        params = [irt_params(bank, idx) for idx in items_idx]
+        params = [irt_params(bank, idx, b_cols) for idx in items_idx]
 
         # Prepare the item_params list for lw_dist
         item_params = [Tuple(param) for param in params]
@@ -133,6 +135,8 @@ function simulate_scores_log(
     total_scores_list = Vector{Vector{Float64}}()
     max_total_score = 0
 
+    b_cols = Symbol.(filter(col -> occursin(B_REGEX, string(col)), names(bank)))
+
     for form in 1:n_forms
         # Extract item IDs for the current form
         items = skipmissing(results[:, form])
@@ -142,7 +146,7 @@ function simulate_scores_log(
                      for item_id in items if haskey(id_to_index, item_id)]
 
         # Extract parameters for selected items
-        params = [irt_params(bank, idx) for idx in items_idx]
+        params = [irt_params(bank, idx, b_cols) for idx in items_idx]
 
         # Prepare the item_params list for lw_dist_log
         item_params = [Tuple(param) for param in params]
@@ -181,13 +185,15 @@ function expected_score_curves(
 
     curves_matrix = Matrix{Float64}(undef, n_thetas, n_forms)
 
+    b_cols = Symbol.(filter(col -> occursin(B_REGEX, string(col)), names(bank)))
+
     # Loop over each form
     for i in 1:n_forms
         selected = results[:, i]  # Selected item IDs (strings)
         scores = zeros(Float64, n_thetas)
 
         # Retrieve parameters for selected items using item IDs
-        item_params = [irt_params(bank, id_to_index[id])
+        item_params = [irt_params(bank, id_to_index[id], b_cols)
                        for id in selected if !ismissing(id)]
 
         # Calculate scores for each theta value
@@ -222,10 +228,12 @@ function expected_info_curves(
     # Pre-allocate the curves matrix (theta points x forms)
     curves_matrix = Matrix{Float64}(undef, n_thetas, n_forms)
 
+    b_cols = Symbol.(filter(col -> occursin(B_REGEX, string(col)), names(bank)))
+
     # Loop over each form
     for i in 1:n_forms
         selected = results[:, i]  # Select the i-th column (item IDs as strings)
-        item_params = [irt_params(bank, id_to_index[id])
+        item_params = [irt_params(bank, id_to_index[id], b_cols)
                        for id in selected if !ismissing(id)]
 
         # Initialize a vector to store the total information at each theta value
