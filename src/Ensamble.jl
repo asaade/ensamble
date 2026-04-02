@@ -187,6 +187,10 @@ Main entry point for assembling tests. Loads configurations, runs the solver,
 and processes the results, then generates and saves a report.
 """
 function assemble_tests(config_file::String = "data/config.toml")::DataFrame
+    if !isdir("results")
+        mkpath("results")
+    end
+
     config, orig_parms = configure_system(config_file)
 
     constraints = read_constraints(config.constraints_file, orig_parms)
