@@ -201,7 +201,7 @@ function expected_score_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 
     score_matrix = zeros(num_items, num_thetas)
 
     # Extracting difficulty parameters (bs) from columns B1, B2, etc.
-    b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
+    b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
     @threads for idx in 1:num_items
         model = bank[idx, :MODEL]
@@ -228,7 +228,7 @@ function expected_info_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 1
     info_matrix = zeros(num_items, num_thetas)
 
     # Extract difficulty parameter columns once
-    b_columns = filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank))
+    b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
     @threads for idx in 1:num_items
         model = bank[idx, :MODEL]

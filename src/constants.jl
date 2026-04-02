@@ -6,6 +6,7 @@ const SEPARATOR = "====================================="
 const SAVE_FILE_NAME = "results/forms.csv"
 
 const LOADING_CONFIGURATION_MESSAGE = "Loading configuration..."
+const B_REGEX = r"^B\d*$|^B$"
 const OPTIMIZATION_RESULTS_TITLE = "\nOptimization Results:"
 const OPTIMIZATION_FAILED_MESSAGE = "Optimization failed"
 const RUNNING_OPTIMIZATION_MESSAGE = "Running optimization..."

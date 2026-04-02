@@ -37,9 +37,3 @@ b = @benchmark simulate_scores($bank, $results, $dist)
 display(b)
 println()
 
-res2 = simulate_scores_log(bank, results, dist)
-
-println("Benchmarking simulate_scores_log...")
-b2 = @benchmark simulate_scores_log($bank, $results, $dist)
-display(b2)
-println()
