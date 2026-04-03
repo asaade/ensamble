@@ -203,18 +203,25 @@ function expected_score_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 
     # Extracting difficulty parameters (bs) from columns B1, B2, etc.
     b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
-    @threads for idx in 1:num_items
-        model = bank[idx, :MODEL]
-        a = bank[idx, :A]
-        c = if model == "3PL"
-            bank[idx, :C]
-        else
-            0.0  # Default value for non-3PL models to ensure consistent type handling
-        end
-        bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+    # Extract columns to avoid DataFrame indexing inside the loop
+    models = bank.MODEL
+    as = bank.A
+    has_c = hasproperty(bank, :C)
+    cs = has_c ? bank.C : missing
+    b_data = [bank[!, col] for col in b_columns]
 
-        # Ensure bs is always a vector, even for dichotomous models
-        bs = length(bs) == 1 ? [bs[1]] : bs
+    @threads for idx in 1:num_items
+        model = models[idx]
+        a = as[idx]
+        c = (model == "3PL" && has_c) ? cs[idx] : 0.0
+
+        bs = Float64[]
+        for b_col in b_data
+            v = b_col[idx]
+            if !ismissing(v)
+                push!(bs, Float64(v))
+            end
+        end
 
         expected_scores = map(θ -> expected_score_item(a, bs, c, model, θ; D = D), θ_values)
         score_matrix[idx, :] .= expected_scores
@@ -230,18 +237,25 @@ function expected_info_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 1
     # Extract difficulty parameter columns once
     b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
-    @threads for idx in 1:num_items
-        model = bank[idx, :MODEL]
-        a = bank[idx, :A]
-        c = if model == "3PL"
-            bank[idx, :C]
-        else
-            0.0  # Default value for non-3PL models to ensure consistent type handling
-        end
-        bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+    # Extract columns to avoid DataFrame indexing inside the loop
+    models = bank.MODEL
+    as = bank.A
+    has_c = hasproperty(bank, :C)
+    cs = has_c ? bank.C : missing
+    b_data = [bank[!, col] for col in b_columns]
 
-        # Ensure bs is always a vector, even for dichotomous models
-        bs = length(bs) == 1 ? [bs[1]] : bs
+    @threads for idx in 1:num_items
+        model = models[idx]
+        a = as[idx]
+        c = (model == "3PL" && has_c) ? cs[idx] : 0.0
+
+        bs = Float64[]
+        for b_col in b_data
+            v = b_col[idx]
+            if !ismissing(v)
+                push!(bs, Float64(v))
+            end
+        end
 
         for (j, θ) in enumerate(θ_values)
             info_matrix[idx, j] = info_item(a, bs, c, model, θ; D = D)
