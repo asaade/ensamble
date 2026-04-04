@@ -203,15 +203,22 @@ function expected_score_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 
     # Extracting difficulty parameters (bs) from columns B1, B2, etc.
     b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
+    # Pre-extract DataFrame columns to arrays to avoid overhead within @threads
+    models = bank.MODEL
+    as = bank.A
+    has_c = "C" in names(bank)
+    cs = has_c ? bank.C : fill(0.0, num_items)
+    b_arrays = [bank[!, col] for col in b_columns]
+
     @threads for idx in 1:num_items
-        model = bank[idx, :MODEL]
-        a = bank[idx, :A]
+        model = models[idx]
+        a = as[idx]
         c = if model == "3PL"
-            bank[idx, :C]
+            cs[idx]
         else
             0.0  # Default value for non-3PL models to ensure consistent type handling
         end
-        bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+        bs = Float64[b_arrays[i][idx] for i in 1:length(b_arrays) if !ismissing(b_arrays[i][idx])]
 
         # Ensure bs is always a vector, even for dichotomous models
         bs = length(bs) == 1 ? [bs[1]] : bs
@@ -230,15 +237,22 @@ function expected_info_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 1
     # Extract difficulty parameter columns once
     b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
+    # Pre-extract DataFrame columns to arrays to avoid overhead within @threads
+    models = bank.MODEL
+    as = bank.A
+    has_c = "C" in names(bank)
+    cs = has_c ? bank.C : fill(0.0, num_items)
+    b_arrays = [bank[!, col] for col in b_columns]
+
     @threads for idx in 1:num_items
-        model = bank[idx, :MODEL]
-        a = bank[idx, :A]
+        model = models[idx]
+        a = as[idx]
         c = if model == "3PL"
-            bank[idx, :C]
+            cs[idx]
         else
             0.0  # Default value for non-3PL models to ensure consistent type handling
         end
-        bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+        bs = Float64[b_arrays[i][idx] for i in 1:length(b_arrays) if !ismissing(b_arrays[i][idx])]
 
         # Ensure bs is always a vector, even for dichotomous models
         bs = length(bs) == 1 ? [bs[1]] : bs
