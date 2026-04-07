@@ -203,15 +203,28 @@ function expected_score_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 
     # Extracting difficulty parameters (bs) from columns B1, B2, etc.
     b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
+    # Pre-extract columns to avoid DataFrame indexing inside the threaded loop
+    models = bank.MODEL
+    as = bank.A
+    cs = hasproperty(bank, :C) ? bank.C : fill(0.0, num_items)
+    b_cols_data = [bank[!, col] for col in b_columns]
+
     @threads for idx in 1:num_items
-        model = bank[idx, :MODEL]
-        a = bank[idx, :A]
+        model = models[idx]
+        a = as[idx]
         c = if model == "3PL"
-            bank[idx, :C]
+            cs[idx]
         else
             0.0  # Default value for non-3PL models to ensure consistent type handling
         end
-        bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+
+        bs = Float64[]
+        for col_data in b_cols_data
+            val = col_data[idx]
+            if !ismissing(val)
+                push!(bs, Float64(val))
+            end
+        end
 
         # Ensure bs is always a vector, even for dichotomous models
         bs = length(bs) == 1 ? [bs[1]] : bs
@@ -230,15 +243,28 @@ function expected_info_matrix(bank::DataFrame, θ_values::Vector{Float64}; D = 1
     # Extract difficulty parameter columns once
     b_columns = Symbol.(filter(col -> occursin(r"^B\d*$|^B$", string(col)), names(bank)))
 
+    # Pre-extract columns to avoid DataFrame indexing inside the threaded loop
+    models = bank.MODEL
+    as = bank.A
+    cs = hasproperty(bank, :C) ? bank.C : fill(0.0, num_items)
+    b_cols_data = [bank[!, col] for col in b_columns]
+
     @threads for idx in 1:num_items
-        model = bank[idx, :MODEL]
-        a = bank[idx, :A]
+        model = models[idx]
+        a = as[idx]
         c = if model == "3PL"
-            bank[idx, :C]
+            cs[idx]
         else
             0.0  # Default value for non-3PL models to ensure consistent type handling
         end
-        bs = [bank[idx, col] for col in b_columns if !ismissing(bank[idx, col])]
+
+        bs = Float64[]
+        for col_data in b_cols_data
+            val = col_data[idx]
+            if !ismissing(val)
+                push!(bs, Float64(val))
+            end
+        end
 
         # Ensure bs is always a vector, even for dichotomous models
         bs = length(bs) == 1 ? [bs[1]] : bs
